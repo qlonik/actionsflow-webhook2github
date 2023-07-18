@@ -13,9 +13,11 @@ import {
   EVENT_TYPE,
   systemHeaders,
 } from './constants'
+
 export default async function forward(request: IRequest): Promise<Response> {
   const params = request.params
-  let forwardUrl = `https://api.github.com/repos/${params.owner}/${params.repo}/dispatches`
+  const repoPath = GITHUB_REPO ?? `${params.owner}/${params.repo}`
+  let forwardUrl = `https://api.github.com/repos/${repoPath}/dispatches`
   let payloadPath = params.path
     ? '/' + (params.path as string[]).join('/')
     : '/'
@@ -25,6 +27,7 @@ export default async function forward(request: IRequest): Promise<Response> {
     'X-Github-Authorization',
   )
   const authorization = request.headers.get('Authorization')
+  const authTokenFromEnv = GITHUB_TOKEN;
 
   let githubAuthorization = ''
   if (githubToken) {
@@ -37,6 +40,8 @@ export default async function forward(request: IRequest): Promise<Response> {
     }
   } else if (authorization) {
     githubAuthorization = authorization
+  } else if (authTokenFromEnv) {
+    githubAuthorization = `token ${authTokenFromEnv}`;
   }
   const forwardHeaders = new Headers({
     'Content-Type': 'application/json',

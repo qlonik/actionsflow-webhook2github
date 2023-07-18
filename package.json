@@ -7,7 +7,7 @@
   "scripts": {
     "build": "webpack",
     "dev": "NODE_ENV=development npm run build",
-    "start": "wrangler dev",
+    "start": "wrangler dev src/index.ts",
     "log": "wrangler tail",
     "deploy": "wrangler publish",
     "deploy:production": "npm run deploy -- --env production",

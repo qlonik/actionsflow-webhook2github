@@ -5,6 +5,7 @@ import { IRequest, IParams } from './interface'
 import { getBody, cors, getHeadersObj } from './utils'
 import { log } from './log'
 import { log as report } from './sentry'
+
 export async function handleRequest(
   request: Request,
   event: FetchEvent,
@@ -31,7 +32,7 @@ export async function handleRequest(
     const urlObj = new URL(url)
     const pathname = urlObj.pathname
     // only forwarn /:owner/:repo/:path*
-    const forwardMatchedRoute = '/:owner/:repo/:path*'
+    const forwardMatchedRoute = GITHUB_REPO ? '/:path*' : '/:owner/:repo/:path*'
     // match specific path
     const matchFn = match(forwardMatchedRoute, { decode: decodeURIComponent })
     const matchResult = matchFn(pathname)
@@ -77,7 +78,7 @@ export async function handleRequest(
       headers: secondCorsResult.headers,
     })
     return newResponse
-  } catch (e) {
+  } catch (e: any) {
     // event.waitUntil(report(e, request))
     return new Response(
       JSON.stringify({
